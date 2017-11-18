@@ -1,0 +1,254 @@
+<html lang="en">
+	<head>
+		<title>Necropolis Clan Stats</title>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+		<script type="text/javascript" src="https://code.highcharts.com/modules/data.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+		<style type="text/css">
+			h1 {
+				text-align: center;
+				padding-bottom: 1em;
+			}
+			.col {
+				padding: 1em;
+			}
+			button {
+				font-size: smaller;
+			}
+		</style>
+
+		<script>
+			$.get('clan_xp.csv', function(csv) {
+			    $('#clan_xp').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Daily XP Gain'
+			        },
+			    });
+			});
+			$.get('clan_actions_total.csv', function(csv) {
+			    $('#clan_actions_total').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Total Clan Actions'
+			        },
+			    });
+			});
+			$.get('clan_actions_avg.csv', function(csv) {
+			    $('#clan_actions_avg').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Average Clan Actions'
+			        },
+			    });
+			});
+			$.get('clan_donations_plat.csv', function(csv) {
+			    $('#clan_donations_plat').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Platinum Donations'
+			        },
+			    });
+			});
+			$.get('clan_donations_gold.csv', function(csv) {
+			    $('#clan_donations_gold').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Gold Donations'
+			        },
+			    });
+			});
+			$.get('individual_lastactive.csv', function(csv) {
+			    $('#individual_lastactive').highcharts({
+			        chart: {
+			            type: 'bar'
+			        },
+			        data: {
+			            csv: csv
+			        },
+			        title: {
+			            text: "Member Inactivity"
+			        },
+			        subtitle: {
+			        	text: "Updated daily; only shows >1 day inactive"
+			        },
+			        yAxis: {
+			        	plotLines: [{
+			        		value: 14,
+			        		color: 'red',
+			        		dashStyle: 'shortdash',
+			        		width: 2,
+			        		label: {
+			        			text: 'Two-week cutoff'
+			        		}
+			        	}]
+			        }
+			    });
+			});
+			$.get('individual_actions.csv', function(csv) {
+			    $('#individual_actions').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Total Actions'
+			        },
+			    });
+				var chart = $('#individual_actions').highcharts();
+				$(document).on('click', '#hide-all-acts', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-acts', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+			/*
+			$.get('individual_stats.csv', function(csv) {
+			    $('#individual_stats').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Base Stats'
+			        },
+			    });
+				var chart = $('#individual_stats').highcharts();
+				$(document).on('click', '#hide-all-stats', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-stats', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+			*/
+			$.get('individual_xpdonated.csv', function(csv) {
+			    $('#individual_xpdonated').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual XP Donated'
+			        },
+			    });
+				var chart = $('#individual_xpdonated').highcharts();
+				$(document).on('click', '#hide-all-xp', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-xp', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Necropolis Clan Stats</h1>
+		<p style="text-align: center">
+			Data is collected daily at 10 p.m. server time; the graphs are updated shortly thereafter.
+		</p>
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<div id="clan_xp"></div>
+				</div>
+				<div class="col">
+					<div id="individual_lastactive"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="clan_actions_total"></div>
+				</div>
+				<div class="col">
+					<div id="clan_actions_avg"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="clan_donations_plat"></div>
+				</div>
+				<div class="col">
+					<div id="clan_donations_gold"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_actions"></div>
+					<button id="show-all-acts">Show All</button>
+					<button id="hide-all-acts">Hide All</button>
+				</div>
+				<div class="col">
+					<div id="individual_xpdonated"></div>
+					<button id="show-all-xp">Show All</button>
+					<button id="hide-all-xp">Hide All</button>
+				</div>
+			</div>
+			<!--
+			<div class="row">
+				<div class="col">
+					<div id="individual_stats"></div>
+					<button id="show-all-stats">Show All</button>
+					<button id="hide-all-stats">Hide All</button>
+				</div>
+			</div>
+			-->
+		</div>
+	</body>
+</html>
