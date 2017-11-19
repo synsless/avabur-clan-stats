@@ -270,7 +270,7 @@ for u in usernames:
     avgacts.append((u, avg))
 
 ## sort by average
-#avgacts = sorted(avgacts, key=lambda x: x[1])
+avgacts = sorted(avgacts, key=lambda x: x[1])
 
 ## Print it!
 with open(os.path.join(settings['csvdir'], 'individual_avgacts.csv'), 'w', newline='') as csvfile:
