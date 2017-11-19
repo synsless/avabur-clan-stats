@@ -48,6 +48,9 @@
 			        title: {
 			            text: 'Total Clan Actions'
 			        },
+			        credits: {
+			        	text: "Changes in membership can cause wild swings"
+			        }
 			    });
 			});
 			$.get('clan_actions_avg.csv', function(csv) {
@@ -62,6 +65,9 @@
 			        title: {
 			            text: 'Average Clan Actions'
 			        },
+			        credits: {
+			        	text: "Changes in membership can cause wild swings"
+			        }
 			    });
 			});
 			$.get('clan_donations_plat.csv', function(csv) {
@@ -196,6 +202,26 @@
 					});
 				});
 			});
+			$.get('individual_avgacts.csv', function(csv) {
+			    $('#individual_avgacts').highcharts({
+			        chart: {
+			            type: 'column'
+			        },
+			        xAxis: {
+					    labels: {
+					        style: {
+					            fontSize: '7px'
+					        }
+					    }			        	
+			        },
+			        data: {
+			            csv: csv,
+			        },
+			        title: {
+			            text: 'Average Actions'
+			        },
+			    });
+			});
 		</script>
 	</head>
 	<body>
@@ -235,20 +261,16 @@
 					<button id="hide-all-acts">Hide All</button>
 				</div>
 				<div class="col">
+					<div id="individual_avgacts"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
 					<div id="individual_xpdonated"></div>
 					<button id="show-all-xp">Show All</button>
 					<button id="hide-all-xp">Hide All</button>
 				</div>
 			</div>
-			<!--
-			<div class="row">
-				<div class="col">
-					<div id="individual_stats"></div>
-					<button id="show-all-stats">Show All</button>
-					<button id="hide-all-stats">Hide All</button>
-				</div>
-			</div>
-			-->
 		</div>
 	</body>
 </html>

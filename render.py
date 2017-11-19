@@ -250,7 +250,37 @@ with open(os.path.join(settings['csvdir'], 'individual_lastactive.csv'), 'w', ne
     for row in recs:
         csvw.writerow(row)
 
+#per-user average actions
+## Get max date
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of current users
+c.execute("SELECT DISTINCT(username) FROM members where datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
+usernames = [x[0] for x in c.fetchall()]
+
+## Now get their total action data
+avgacts = list()
+for u in usernames:
+    totals = []
+    for row in c.execute("SELECT totalacts FROM members WHERE username=? ORDER BY datestamp", [u]):
+        totals.append(row[0])
+    deltas = calcDeltas(totals)
+    avg = round(sum(deltas) / len(deltas))
+    avgacts.append((u, avg))
+
+## sort by average
+#avgacts = sorted(avgacts, key=lambda x: x[1])
+
+## Print it!
+with open(os.path.join(settings['csvdir'], 'individual_avgacts.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Member","Average Actions"])
+    for row in avgacts:
+        csvw.writerow(row)
+
+
 c.close()
 conn.close()
-
+print("Done!")
 
