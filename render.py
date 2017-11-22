@@ -106,8 +106,12 @@ with open(os.path.join(settings['csvdir'], 'clan_donations_gold.csv'), 'w', newl
         csvw.writerow(row)
 
 #per-user total actions
-## First get list of all users
-c.execute("SELECT DISTINCT(username) FROM members ORDER BY username COLLATE NOCASE")
+## First get maxdate
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of current members
+c.execute("SELECT DISTINCT(username) FROM members WHERE datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
 usernames = [x[0] for x in c.fetchall()]
 
 ## Get list of distinct dates
@@ -199,8 +203,12 @@ with open(os.path.join(settings['csvdir'], 'individual_stats.csv'), 'w', newline
         csvw.writerow(row)
 
 #per-user xp donations
-## First get list of all users
-c.execute("SELECT DISTINCT(username) FROM members ORDER BY username COLLATE NOCASE")
+## Get latest date
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of all current members
+c.execute("SELECT DISTINCT(username) FROM members WHERE datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
 usernames = [x[0] for x in c.fetchall()]
 
 ## Get list of distinct dates
