@@ -27,6 +27,17 @@ def buildData(dates, deltas):
             ret.append((dates[i], deltas[i]))
     return ret
 
+def trimOutliers(lst, percent, ceil=True):
+    lst = sorted(lst)
+    count = len(lst) * percent
+    if ceil:
+        count = math.ceil(count)
+    else:
+        count = math.floor(count)
+    if (count*2 >= len(lst)):
+        return(lst)
+    else:
+        return lst[count:len(lst)-count]
 
 #Load settings
 with open('/home/protected/avabur/settings.json') as j:
@@ -266,6 +277,7 @@ for u in usernames:
     for row in c.execute("SELECT totalacts FROM members WHERE username=? ORDER BY datestamp", [u]):
         totals.append(row[0])
     deltas = calcDeltas(totals)
+    deltas = trimOutliers(deltas, 0.1)
     avg = round(sum(deltas) / len(deltas))
     avgacts.append((u, avg))
 
@@ -279,8 +291,13 @@ with open(os.path.join(settings['csvdir'], 'individual_avgacts.csv'), 'w', newli
     for row in avgacts:
         csvw.writerow(row)
 
+# Treasury status (single graph)
+with open(os.path.join(settings['csvdir'], 'clan_treasury.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Date","Crystals", "Platinum", "Gold", "Food", "Wood", "Iron", "Stone"])
+    for row in c.execute("SELECT datestamp, crystals, platinum, gold, food, wood, iron, stone FROM clan ORDER BY datestamp"):
+        csvw.writerow(row)
 
 c.close()
 conn.close()
-print("Done!")
 
