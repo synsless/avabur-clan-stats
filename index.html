@@ -5,6 +5,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 		<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
 		<script type="text/javascript" src="https://code.highcharts.com/modules/data.js"></script>
+		<script type="text/javascript" src="https://code.highcharts.com/modules/exporting.js"></script>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
@@ -48,6 +49,9 @@
 			        title: {
 			            text: 'Total Clan Actions'
 			        },
+			        subtitle: {
+			        	text: '(swings of more than 500,000 trimmed)'
+			        },
 			        credits: {
 			        	text: "Changes in membership can cause wild swings"
 			        }
@@ -64,6 +68,9 @@
 			        },
 			        title: {
 			            text: 'Average Clan Actions'
+			        },
+			        subtitle: {
+			        	text: '(swings of more than 50,000 trimmed)'
 			        },
 			        credits: {
 			        	text: "Changes in membership can cause wild swings"
@@ -249,7 +256,56 @@
 			            text: 'Average Actions (Trimmed)'
 			        },
 			        subtitle: {
-			        	text: '(top and bottom 10% ignored)'
+			        	text: "(top and bottom 10% of each member's action count ignored)"
+			        }
+			    });
+			});
+			$.get('individual_ratios.csv', function(csv) {
+			    $('#individual_ratios').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        xAxis: {
+					    labels: {
+					        style: {
+					            fontSize: '10px'
+					        }
+					    }			        	
+			        },
+			        yAxis: {
+			        	max: 1,
+			        	plotLines: [
+				        	{
+				        		value: 0.75,
+				        		color: 'red',
+				        		dashStyle: 'shortdash',
+				        		width: 2,
+				        		label: {
+				        			text: 'Clear battlers'
+				        		}
+				        	},
+				        	{
+				        		value: 0.25,
+				        		color: 'red',
+				        		dashStyle: 'shortdash',
+				        		width: 2,
+				        		label: {
+				        			text: 'Clear TSers',
+				        			y: 12
+				        		}
+				        	}
+			        	]
+			        },
+			        plotOptions: {
+			        	series: {
+			        		lineWidth: 0
+			        	}
+			        },
+			        data: {
+			            csv: csv,
+			        },
+			        title: {
+			            text: 'Battler/TSer Ratio'
 			        }
 			    });
 			});
@@ -307,6 +363,11 @@
 			<div class="row">
 				<div class="col">
 					<div id="individual_avgacts"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_ratios"></div>
 				</div>
 			</div>
 		</div>

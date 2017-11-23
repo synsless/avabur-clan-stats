@@ -71,6 +71,21 @@ totals = [x[1] for x in recs]
 counts = [x[2] for x in recs]
 deltas = calcDeltas(totals)
 avgs = [round(deltas[i] / counts[i]) for i in range(len(deltas))]
+
+## Try to trim really wide swings
+dd = calcDeltas(deltas)
+print(dd)
+for i in range(len(dd)):
+    if abs(dd[i]) > 500000:
+        deltas[i+1] = None
+print(deltas)
+dd = calcDeltas(avgs)
+print(dd)
+for i in range(len(dd)):
+    if abs(dd[i]) > 50000:
+        avgs[i+1] = None
+print(avgs)
+
 totaldata = buildData(dates, deltas)
 avgdata = buildData(dates, avgs)
 with open(os.path.join(settings['csvdir'], 'clan_actions_total.csv'), 'w', newline='') as csvfile:
@@ -304,6 +319,30 @@ with open(os.path.join(settings['csvdir'], 'clan_treasury.csv'), 'w', newline=''
     csvw = csv.writer(csvfile, dialect=csv.excel)
     csvw.writerow(["Date","Crystals", "Platinum", "Gold", "Food", "Wood", "Iron", "Stone"])
     for row in c.execute("SELECT datestamp, crystals, platinum, gold, food, wood, iron, stone FROM clan ORDER BY datestamp"):
+        csvw.writerow(row)
+
+# Battler/harvest ratio
+## Get max date
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of current users
+c.execute("SELECT DISTINCT(username) FROM members where datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
+usernames = [x[0] for x in c.fetchall()]
+
+## Get battle/harvest data
+treedata = list()
+for row in c.execute("SELECT username, ((max(kills)-min(kills))+(max(deaths)-min(deaths))) AS battles, max(harvests)-min(harvests) FROM members GROUP BY username"):
+    if row[0] in usernames:
+        total = row[1] + row[2]
+        ratio = round(row[1] / total, 2)
+        treedata.append((row[0], ratio))
+treedata = sorted(treedata, key=lambda x: (x[1], x[0].lower()))
+
+with open(os.path.join(settings['csvdir'], 'individual_ratios.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Member", "Ratio"])
+    for row in treedata:
         csvw.writerow(row)
 
 c.close()
