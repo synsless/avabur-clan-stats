@@ -56,6 +56,12 @@ recs = c.fetchall()
 dates = [x[0] for x in recs]
 xps = [x[1] for x in recs]
 xpdeltas = calcDeltas(xps)
+
+## Try to trim really wide swings
+for i in range(len(xpdeltas)):
+    if xpdeltas[i] < 0:
+        xpdeltas[i] = None
+
 xpdata = buildData(dates, xpdeltas)
 with open(os.path.join(settings['csvdir'], 'clan_xp.csv'), 'w', newline='') as csvfile:
     csvw = csv.writer(csvfile, dialect=csv.excel)
@@ -74,17 +80,13 @@ avgs = [round(deltas[i] / counts[i]) for i in range(len(deltas))]
 
 ## Try to trim really wide swings
 dd = calcDeltas(deltas)
-print(dd)
 for i in range(len(dd)):
     if abs(dd[i]) > 500000:
         deltas[i+1] = None
-print(deltas)
 dd = calcDeltas(avgs)
-print(dd)
 for i in range(len(dd)):
     if abs(dd[i]) > 50000:
         avgs[i+1] = None
-print(avgs)
 
 totaldata = buildData(dates, deltas)
 avgdata = buildData(dates, avgs)
@@ -332,7 +334,7 @@ usernames = [x[0] for x in c.fetchall()]
 
 ## Get battle/harvest data
 treedata = list()
-for row in c.execute("SELECT username, ((max(kills)-min(kills))+(max(deaths)-min(deaths))) AS battles, max(harvests)-min(harvests) FROM members GROUP BY username"):
+for row in c.execute("SELECT username, ((max(kills)-min(kills))+(max(deaths)-min(deaths))) AS battles, ( (max(harvests)-min(harvests))+(max(craftingacts)-min(craftingacts))+(max(carvingacts)-min(carvingacts))) FROM members GROUP BY username"):
     if row[0] in usernames:
         total = row[1] + row[2]
         ratio = round(row[1] / total, 2)
