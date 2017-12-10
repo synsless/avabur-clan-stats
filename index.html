@@ -212,6 +212,56 @@
 					});
 				});
 			});
+			$.get('individual_golddonated.csv', function(csv) {
+			    $('#individual_golddonated').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Gold Donated'
+			        },
+			    });
+				var chart = $('#individual_golddonated').highcharts();
+				$(document).on('click', '#hide-all-gold', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-gold', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+			$.get('individual_platdonated.csv', function(csv) {
+			    $('#individual_platdonated').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Platinum Donated'
+			        },
+			    });
+				var chart = $('#individual_platdonated').highcharts();
+				$(document).on('click', '#hide-all-plat', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-plat', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
 			$.get('clan_treasury.csv', function(csv) {
 			    $('#clan_treasury').highcharts({
 			        chart: {
@@ -260,6 +310,26 @@
 			        },
 			        subtitle: {
 			        	text: "(top and bottom 10% of each member's action count ignored)"
+			        }
+			    });
+			});
+			$.get('individual_medacts.csv', function(csv) {
+			    $('#individual_medacts').highcharts({
+			        chart: {
+			            type: 'column'
+			        },
+			        xAxis: {
+					    labels: {
+					        style: {
+					            fontSize: '10px'
+					        }
+					    }			        	
+			        },
+			        data: {
+			            csv: csv,
+			        },
+			        title: {
+			            text: 'Median Actions'
 			        }
 			    });
 			});
@@ -325,15 +395,29 @@
 					<div id="clan_xp"></div>
 				</div>
 				<div class="col">
-					<div id="individual_lastactive"></div>
+					<div id="individual_xpdonated"></div>
+					<button id="show-all-xp">Show All</button>
+					<button id="hide-all-xp">Hide All</button>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
-					<div id="clan_actions_total"></div>
+					<div id="clan_actions_avg"></div>
 				</div>
 				<div class="col">
-					<div id="clan_actions_avg"></div>
+					<div id="individual_actions"></div>
+					<button id="show-all-acts">Show All</button>
+					<button id="hide-all-acts">Hide All</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_avgacts"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_medacts"></div>
 				</div>
 			</div>
 			<div class="row">
@@ -341,19 +425,21 @@
 					<div id="clan_donations_plat"></div>
 				</div>
 				<div class="col">
-					<div id="clan_donations_gold"></div>
+					<div id="individual_platdonated"></div>
+					<button id="show-all-plat">Show All</button>
+					<button id="hide-all-plat">Hide All</button>
 				</div>
 			</div>
 			<div class="row">
+			</div>
+			<div class="row">
 				<div class="col">
-					<div id="individual_actions"></div>
-					<button id="show-all-acts">Show All</button>
-					<button id="hide-all-acts">Hide All</button>
+					<div id="clan_donations_gold"></div>
 				</div>
 				<div class="col">
-					<div id="individual_xpdonated"></div>
-					<button id="show-all-xp">Show All</button>
-					<button id="hide-all-xp">Hide All</button>
+					<div id="individual_golddonated"></div>
+					<button id="show-all-gold">Show All</button>
+					<button id="hide-all-gold">Hide All</button>
 				</div>
 			</div>
 			<div class="row">
@@ -362,10 +448,8 @@
 					<button id="show-all-treas">Show All</button>
 					<button id="hide-all-treas">Hide All</button>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col">
-					<div id="individual_avgacts"></div>
+					<div id="individual_lastactive"></div>
 				</div>
 			</div>
 			<div class="row">

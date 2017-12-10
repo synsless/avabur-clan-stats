@@ -39,6 +39,15 @@ def trimOutliers(lst, percent, ceil=True):
     else:
         return lst[count:len(lst)-count]
 
+def calcMedian(lst):
+    lst = sorted(lst)
+    if (len(lst) % 2 == 1):
+        return lst[(len(lst)-1)//2]
+    else:
+        val1 = lst[int(math.floor((len(lst)-1)/2))]
+        val2 = lst[int(math.ceil((len(lst)-1)/2))]
+        return (val1 + val2) / 2
+
 #Load settings
 with open('/home/protected/avabur/settings.json') as j:
     settings = json.load(j)
@@ -274,6 +283,117 @@ with open(os.path.join(settings['csvdir'], 'individual_xpdonated.csv'), 'w', new
     for row in csvout:
         csvw.writerow(row)
 
+#per-user gold donations
+## Get latest date
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of all current members
+c.execute("SELECT DISTINCT(username) FROM members WHERE datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
+usernames = [x[0] for x in c.fetchall()]
+
+## Get list of distinct dates
+c.execute("SELECT DISTINCT(datestamp) FROM members ORDER BY datestamp")
+alldates = [x[0] for x in c.fetchall()]
+alldates.pop(0)
+
+## Now get their xp donation data
+rawdata = dict()
+for u in usernames:
+    rawdata[u] = list()
+    for row in c.execute("SELECT datestamp, d_gold FROM members WHERE username=?", [u]):
+        rawdata[u].append((row[0], row[1]))
+
+## Now turn that into deltas for each user
+deltadata = dict()
+for u in usernames:
+    dates = [x[0] for x in rawdata[u]]
+    counts = [x[1] for x in rawdata[u]]
+    deltas = calcDeltas(counts)
+    deltadata[u] = buildData(dates, deltas)
+
+## Now convert that into a format suitable for CSV output (rows are dates, users are columns)
+## This uses a number nested loops. It's not the most efficient, but it's good enough.
+csvout = []
+csvout.append(['Date'] + usernames)
+### This gives us the row structure
+for d in alldates:
+    row = [d]
+    ### This loop ensures the correct order
+    for u in usernames:
+        ### Look at each delta entry for the given user and see if it matches the date.
+        found = False
+        for delta in deltadata[u]:
+            if (delta[0] == d):
+                found = True
+                row.append(delta[1])
+                break
+        if not found:
+            row.append(None)
+    csvout.append(row)
+
+## Print it!
+with open(os.path.join(settings['csvdir'], 'individual_golddonated.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    for row in csvout:
+        csvw.writerow(row)
+
+#per-user plat donations
+## Get latest date
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of all current members
+c.execute("SELECT DISTINCT(username) FROM members WHERE datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
+usernames = [x[0] for x in c.fetchall()]
+
+## Get list of distinct dates
+c.execute("SELECT DISTINCT(datestamp) FROM members ORDER BY datestamp")
+alldates = [x[0] for x in c.fetchall()]
+alldates.pop(0)
+
+## Now get their xp donation data
+rawdata = dict()
+for u in usernames:
+    rawdata[u] = list()
+    for row in c.execute("SELECT datestamp, d_platinum FROM members WHERE username=?", [u]):
+        rawdata[u].append((row[0], row[1]))
+
+## Now turn that into deltas for each user
+deltadata = dict()
+for u in usernames:
+    dates = [x[0] for x in rawdata[u]]
+    counts = [x[1] for x in rawdata[u]]
+    deltas = calcDeltas(counts)
+    deltadata[u] = buildData(dates, deltas)
+
+## Now convert that into a format suitable for CSV output (rows are dates, users are columns)
+## This uses a number nested loops. It's not the most efficient, but it's good enough.
+csvout = []
+csvout.append(['Date'] + usernames)
+### This gives us the row structure
+for d in alldates:
+    row = [d]
+    ### This loop ensures the correct order
+    for u in usernames:
+        ### Look at each delta entry for the given user and see if it matches the date.
+        found = False
+        for delta in deltadata[u]:
+            if (delta[0] == d):
+                found = True
+                row.append(delta[1])
+                break
+        if not found:
+            row.append(None)
+    csvout.append(row)
+
+## Print it!
+with open(os.path.join(settings['csvdir'], 'individual_platdonated.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    for row in csvout:
+        csvw.writerow(row)
+
+
 #activity status
 c.execute("SELECT MAX(datestamp) FROM members")
 maxdate = c.fetchone()[0]
@@ -314,6 +434,35 @@ with open(os.path.join(settings['csvdir'], 'individual_avgacts.csv'), 'w', newli
     csvw = csv.writer(csvfile, dialect=csv.excel)
     csvw.writerow(["Member","Average Actions"])
     for row in avgacts:
+        csvw.writerow(row)
+
+#per-user median actions
+## Get max date
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of current users
+c.execute("SELECT DISTINCT(username) FROM members where datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
+usernames = [x[0] for x in c.fetchall()]
+
+## Now get their total action data
+medacts = list()
+for u in usernames:
+    totals = []
+    for row in c.execute("SELECT totalacts FROM members WHERE username=? ORDER BY datestamp", [u]):
+        totals.append(row[0])
+    deltas = calcDeltas(totals)
+    median = round(calcMedian(deltas))
+    medacts.append((u, median))
+
+## sort by average
+medacts = sorted(medacts, key=lambda x: x[1])
+
+## Print it!
+with open(os.path.join(settings['csvdir'], 'individual_medacts.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Member","Median Actions"])
+    for row in medacts:
         csvw.writerow(row)
 
 # Treasury status (single graph)
