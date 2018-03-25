@@ -452,6 +452,7 @@ for u in usernames:
     for row in c.execute("SELECT totalacts FROM members WHERE username=? ORDER BY datestamp", [u]):
         totals.append(row[0])
     deltas = calcDeltas(totals)
+    deltas = trimOutliers(deltas, 0.1)
     median = round(calcMedian(deltas))
     medacts.append((u, median))
 
@@ -486,7 +487,9 @@ treedata = list()
 for row in c.execute("SELECT username, ((max(kills)-min(kills))+(max(deaths)-min(deaths))) AS battles, ( (max(harvests)-min(harvests))+(max(craftingacts)-min(craftingacts))+(max(carvingacts)-min(carvingacts))) FROM members GROUP BY username"):
     if row[0] in usernames:
         total = row[1] + row[2]
-        ratio = round(row[1] / total, 2)
+        ratio = 0
+        if (total > 0):
+            ratio = round(row[1] / total, 2)
         treedata.append((row[0], ratio))
 treedata = sorted(treedata, key=lambda x: (x[1], x[0].lower()))
 
@@ -495,6 +498,13 @@ with open(os.path.join(settings['csvdir'], 'individual_ratios.csv'), 'w', newlin
     csvw.writerow(["Member", "Ratio"])
     for row in treedata:
         csvw.writerow(row)
+
+#Rankings table
+ranks = {'data': []}
+for row in c.execute("SELECT username, skill, rank, level FROM ranks WHERE rank<=100"):
+    ranks['data'].append(row)
+with open(os.path.join(settings['csvdir'], 'ranks.json'), 'w', newline='') as csvfile:
+    json.dump(ranks, csvfile)
 
 c.close()
 conn.close()

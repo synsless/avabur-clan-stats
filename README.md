@@ -1,6 +1,8 @@
 # Relics of Avabur: Clan Stats
 
-A script that gathers stats on your [Relics of Avabur](http://www.avabur.com/?ref=12110) clan. This is *not* a turn-key solution! You'll need to be willing to get your hands a little dirty.
+A script that gathers stats on your [Relics of Avabur](http://www.avabur.com/?ref=12110) clan. This is *not* a turn-key solution! You'll need to be willing to get your hands a little dirty. 
+
+The latest version supports the new API introduced with the 2018 game update.
 
 ## Getting Started
 

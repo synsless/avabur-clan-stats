@@ -8,6 +8,8 @@
 		<script type="text/javascript" src="https://code.highcharts.com/modules/exporting.js"></script>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
 		<style type="text/css">
 			h1 {
@@ -329,7 +331,10 @@
 			            csv: csv,
 			        },
 			        title: {
-			            text: 'Median Actions'
+			            text: 'Median Actions (Trimmed)'
+			        },
+			        subtitle: {
+			        	text: "(top and bottom 10% of each member's action count ignored)"
 			        }
 			    });
 			});
@@ -382,6 +387,13 @@
 			        }
 			    });
 			});
+
+			$(document).ready( function () {
+				$('#ranktable').DataTable( {
+					'ajax': 'ranks.json',
+					'order': [[2, "asc"]] 
+				} );
+			} );
 		</script>
 	</head>
 	<body>
@@ -444,15 +456,27 @@
 			</div>
 			<div class="row">
 				<div class="col">
-					<div id="clan_treasury"></div>
-					<button id="show-all-treas">Show All</button>
-					<button id="hide-all-treas">Hide All</button>
+					<table id="ranktable" class="display" width="100%">
+						<caption>Clan members with rankings in the top 100</caption>
+						<thead>
+							<tr>
+								<th>Username</th>
+								<th>Skill</th>
+								<th>Rank</th>
+								<th>Value</th>
+						</thead>
+					</table>
 				</div>
 				<div class="col">
 					<div id="individual_lastactive"></div>
 				</div>
 			</div>
 			<div class="row">
+				<div class="col">
+					<div id="clan_treasury"></div>
+					<button id="show-all-treas">Show All</button>
+					<button id="hide-all-treas">Hide All</button>
+				</div>
 				<div class="col">
 					<div id="individual_ratios"></div>
 				</div>
