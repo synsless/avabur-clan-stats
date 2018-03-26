@@ -33,6 +33,25 @@ You need to log in as a real user to collect the data. This will log you out of 
 
 The code currently uses absolute paths because of how cronjobs work. You will need to edit those as appropriate.
 
+## Graphs
+
+The current version displays the following graphs and tables:
+
+  * Daily clan XP gain 
+  * Individual xp donated
+  * Average clan actions (big swings are trimmed; swings happen as membership changes)
+  * Individual total actions
+  * Average daily actions per user (top and bottom 10% ignored)
+  * Median daily actions per user (top and bottom 10% ignored)
+  * Aggregate platinum donations
+  * Individual platinum donations
+  * Aggregate gold donations
+  * Individual gold donations
+  * Clan treasury levels
+  * Table listing clan members with top-100 ranks in various skills
+  * Member inactivity
+  * Battler/TS ratio (the ratio of battling actions and crafting/profession actions)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
