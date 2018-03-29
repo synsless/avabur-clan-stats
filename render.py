@@ -88,13 +88,19 @@ deltas = calcDeltas(totals)
 avgs = [round(deltas[i] / counts[i]) for i in range(len(deltas))]
 
 ## Try to trim really wide swings
+actions_total_whatiswide = 500000
+actions_average_whatiswide = 50000
+if 'actions_total_whatiswide' in settings:
+    actions_total_whatiswide = settings['actions_total_whatiswide']
+if 'actions_average_whatiswide' in settings:
+    actions_average_whatiswide = settings['actions_average_whatiswide']
 dd = calcDeltas(deltas)
 for i in range(len(dd)):
-    if abs(dd[i]) > 500000:
+    if abs(dd[i]) > actions_total_whatiswide:
         deltas[i+1] = None
 dd = calcDeltas(avgs)
 for i in range(len(dd)):
-    if abs(dd[i]) > 50000:
+    if abs(dd[i]) > actions_average_whatiswide:
         avgs[i+1] = None
 
 totaldata = buildData(dates, deltas)
@@ -416,13 +422,16 @@ c.execute("SELECT DISTINCT(username) FROM members where datestamp=? ORDER BY use
 usernames = [x[0] for x in c.fetchall()]
 
 ## Now get their total action data
+actions_outliers_percent = 0.1
+if 'actions_outliers_percent' in settings:
+    actions_outliers_percent = settings['actions_outliers_percent']
 avgacts = list()
 for u in usernames:
     totals = []
     for row in c.execute("SELECT totalacts FROM members WHERE username=? ORDER BY datestamp", [u]):
         totals.append(row[0])
     deltas = calcDeltas(totals)
-    deltas = trimOutliers(deltas, 0.1)
+    deltas = trimOutliers(deltas, actions_outliers_percent)
     avg = round(sum(deltas) / len(deltas))
     avgacts.append((u, avg))
 
@@ -452,7 +461,7 @@ for u in usernames:
     for row in c.execute("SELECT totalacts FROM members WHERE username=? ORDER BY datestamp", [u]):
         totals.append(row[0])
     deltas = calcDeltas(totals)
-    deltas = trimOutliers(deltas, 0.1)
+    deltas = trimOutliers(deltas, actions_outliers_percent)
     median = round(calcMedian(deltas))
     medacts.append((u, median))
 

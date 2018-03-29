@@ -33,6 +33,14 @@ You need to log in as a real user to collect the data. This will log you out of 
 
 The code currently uses absolute paths because of how cronjobs work. You will need to edit those as appropriate.
 
+There are also three other settings you can set to change how the graphs are rendered:
+
+  * `actions_total_whatiswide`: Applies to the "Total Clan Actions" graph. Determines how wide the swing has to be to trim it. Defaults to 500000. (Swings are caused by membership changes.)
+  * `actions_average_whatiswide`: Applies to the "Average Clan Actions" graph. Determines how wide the swing has to be to trim it. Defaults to 50000. (Swings are caused by membership changes.)
+  * `actions_outliers_percent`: Applies to the individual average and median actions graphs. Determines how much to chop off each end of the player's action counts before calculating the average/median. Defaults to 0.1 (10%).
+
+Currently, the defaults are hard coded into the HTML file. So if you change them, you'll want to update the graph captions where appropriate. Sorry. One day I'll automate that.
+
 ## Graphs
 
 The current version displays the following graphs and tables:
@@ -55,3 +63,9 @@ The current version displays the following graphs and tables:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+## ToDo
+
+  - [ ] Make `index.html` update the captions based on settings.
+  - [ ] Fix the code so it ignores applicants.
+  
