@@ -98,8 +98,14 @@
 			            dateFormat: 'YYYY/mm/dd'
 			        },
 			        title: {
-			            text: 'Platinum Donations'
+			            text: 'Net Platinum Donations'
 			        },
+			        subtitle: {
+			        	text: '(negative deltas trimmed)'
+			        },
+			        credits: {
+			        	text: "Changes in membership can cause wild swings"
+			        }
 			    });
 			});
 			$.get('clan_donations_gold.csv', function(csv) {
@@ -112,8 +118,14 @@
 			            dateFormat: 'YYYY/mm/dd'
 			        },
 			        title: {
-			            text: 'Gold Donations'
+			            text: 'Net Gold Donations'
 			        },
+			        subtitle: {
+			        	text: '(negative deltas trimmed)'
+			        },
+			        credits: {
+			        	text: "Changes in membership can cause wild swings"
+			        }
 			    });
 			});
 			$.get('individual_lastactive.csv', function(csv) {

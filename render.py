@@ -123,7 +123,15 @@ dates = [x[0] for x in recs]
 plat = [x[2] for x in recs]
 gold = [x[3] for x in recs]
 plat = calcDeltas(plat)
+## Try to trim really wide swings
+for i in range(len(plat)):
+    if plat[i] < 0:
+        plat[i] = None
 gold = calcDeltas(gold)
+## Try to trim really wide swings
+for i in range(len(gold)):
+    if gold[i] < 0:
+        gold[i] = None
 platdata = buildData(dates, plat)
 golddata = buildData(dates, gold)
 with open(os.path.join(settings['csvdir'], 'clan_donations_plat.csv'), 'w', newline='') as csvfile:
@@ -358,7 +366,7 @@ c.execute("SELECT DISTINCT(datestamp) FROM members ORDER BY datestamp")
 alldates = [x[0] for x in c.fetchall()]
 alldates.pop(0)
 
-## Now get their xp donation data
+## Now get their plat donation data
 rawdata = dict()
 for u in usernames:
     rawdata[u] = list()
