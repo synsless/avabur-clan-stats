@@ -67,5 +67,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## ToDo
 
   - [ ] Make `index.html` update the captions based on settings.
-  - [ ] Fix the code so it ignores applicants.
-  
+  - [X] Fix the code so it ignores applicants.
