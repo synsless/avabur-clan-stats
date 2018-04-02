@@ -171,7 +171,7 @@ for event in ws:
                     print("Processing clan membership list")
                     members = json.loads(json.dumps(j))
                     for m in j['members']:
-                        if m['rankid'] < 0:
+                        if int(m['rankid']) < 0:
                             continue
                         sleep(1)
                         print("Requesting profile for {}".format(m['username'].upper()))
@@ -238,7 +238,7 @@ try:
     c.execute("REPLACE INTO clan (datestamp, xp, crystals, platinum, gold, food, wood, iron, stone) VALUES (date('now'), ?, ?, ?, ?, ?, ?, ?, ?)", (clan['experience'], treas['crystals'], treas['platinum'], treas['gold'], treas['food'], treas['wood'], treas['iron'], treas['stone']))
     #members
     for member in members['members']:
-        if member['rankid'] >= 0:
+        if int(member['rankid']) >= 0:
             k = member['username']
             totalacts = profiles[k]['kills'] + profiles[k]['deaths'] + profiles[k]['harvests'] + profiles[k]['crafting_acts'] + profiles[k]['carving_acts']
             c.execute("REPLACE INTO members (userid, datestamp, username, level, fishing, woodcutting, mining, stonecutting, crafting, carving, stats, kills, deaths, harvests, resources, craftingacts, carvingacts, quests, totalacts, lastactive, d_crystals, d_platinum, d_gold, d_food, d_wood, d_iron, d_stone, d_xp) VALUES (?, date('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (int(member['userid']), k, profiles[k]['level'], profiles[k]['fishing'], profiles[k]['woodcutting'], profiles[k]['mining'], profiles[k]['stonecutting'], profiles[k]['crafting'], profiles[k]['carving'], profiles[k]['stats'], profiles[k]['kills'], profiles[k]['deaths'], profiles[k]['harvests'], profiles[k]['resources'], profiles[k]['crafting_acts'], profiles[k]['carving_acts'], profiles[k]['quests'], totalacts, int(member['active_time']), donations[k]['crystals'], donations[k]['platinum'], donations[k]['gold'], donations[k]['food'], donations[k]['wood'], donations[k]['iron'], donations[k]['stone'], donations[k]['experiences']))
@@ -264,7 +264,7 @@ try:
         ('Quests', 'rank_quests', 'quests'),
     ]
     for member in members['members']:
-        if member['rankid'] >= 0:
+        if int(member['rankid']) >= 0:
             k = member['username']
             for s in skills:
                 c.execute("REPLACE INTO ranks (userid, username, skill, level, rank) VALUES (?, ?, ?, ?, ?)", (int(member['userid']), k, s[0], profiles[k][s[2]], profiles[k][s[1]]))
