@@ -60,6 +60,10 @@ The current version displays the following graphs and tables:
   * Member inactivity
   * Battler/TS ratio (the ratio of battling actions and crafting/profession actions)
 
+## Optional Components
+
+I've added `market.py`, which collects all the market entries except those for weapons, armour, and gems. Right now there is no script to munge that data, but I'll come up with that soon enough. For now you can at least store that data, if you want it. If you don't, just don't execute this script.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
