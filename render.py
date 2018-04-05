@@ -523,6 +523,25 @@ for row in c.execute("SELECT username, skill, rank, level FROM ranks WHERE rank<
 with open(os.path.join(settings['csvdir'], 'ranks.json'), 'w', newline='') as csvfile:
     json.dump(ranks, csvfile)
 
+#Nearest clans
+data = list()
+for row in c.execute("SELECT datestamp, ours, above, below FROM nearestclans ORDER BY datestamp"):
+    node = [row[0]]
+    if row[2] is not None:
+        node.append(abs(row[1] - row[2]))
+    else:
+        node.append(0)
+    if row[3] is not None:
+        node.append(abs(row[1] - row[3]))
+    else:
+        node.append(0)
+    data.append(node)
+with open(os.path.join(settings['csvdir'], 'clan_nearest.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Date","Above", "Below"])
+    for row in data:
+        csvw.writerow(row)
+
 c.close()
 conn.close()
 

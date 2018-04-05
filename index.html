@@ -405,6 +405,34 @@
 			        }
 			    });
 			});
+			$.get('clan_nearest.csv', function(csv) {
+			    $('#clan_nearest').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Level Difference With Nearest Clans'
+			        },
+			        credits: {
+			        	text: 'The "Above" line should be sloping towards zero. The "Below" line should be sloping towards infinity.'
+			        }
+			    });
+				var chart = $('#clan_nearest').highcharts();
+				$(document).on('click', '#hide-all-nc', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-nc', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
 
 			$(document).ready( function () {
 				$('#ranktable').DataTable( {
@@ -495,6 +523,13 @@
 					<button id="show-all-treas">Show All</button>
 					<button id="hide-all-treas">Hide All</button>
 				</div>
+				<div class="col">
+					<div id="clan_nearest"></div>
+					<button id="show-all-nc">Show All</button>
+					<button id="hide-all-nc">Hide All</button>
+				</div>
+			</div>
+			<div class="row">
 				<div class="col">
 					<div id="individual_ratios"></div>
 				</div>
