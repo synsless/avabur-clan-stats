@@ -37,6 +37,7 @@ try:
     c.execute('CREATE INDEX IF NOT EXISTS market_resource_idx on market (resource);')
     c.execute('CREATE INDEX IF NOT EXISTS market_quantity_idx on market (quantity);')
     c.execute('CREATE INDEX IF NOT EXISTS market_price_idx on market (price);')
+    c.execute('DELETE FROM market WHERE datestamp=date("now");')
 except Exception as e:
     conn.rollback()
     c.close()
@@ -150,7 +151,7 @@ c = conn.cursor()
 try:
     for resource in resources.keys():
         for rec in resources[resource].values():
-            c.execute("INSERT INTO market (tid, datestamp, resource, quantity, price, seller) VALUES (?, datetime('now'), ?, ?, ?, ?)", (rec['tid'], rec['n'], rec['v'], rec['price'], rec['seller']))
+            c.execute("INSERT INTO market (tid, datestamp, resource, quantity, price, seller) VALUES (?, date('now'), ?, ?, ?, ?)", (rec['tid'], rec['n'], rec['v'], rec['price'], rec['seller']))
 
 except Exception as e:
     conn.rollback()

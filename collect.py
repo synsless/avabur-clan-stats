@@ -80,6 +80,14 @@ try:
             PRIMARY KEY (userid, datestamp)
         );
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS nearestclans (
+            datestamp STRING PRIMARY KEY,
+            above REAL,
+            ours REAL,
+            below REAL
+        );
+    ''')
 except Exception as e:
     conn.rollback()
     c.close()
@@ -115,12 +123,14 @@ msgs['clan_members'] = json.dumps({'clan': '%%', 'type': 'page', 'page': 'clan_m
 msgs['clan_treasury'] = json.dumps({'clan': '%%', 'type': 'page', 'page': 'clan_treasury'})
 msgs['clan_donations'] = json.dumps({'type': 'page', 'page': 'clan_donations'})
 msgs['profile'] = json.dumps({'type': 'page', 'page': 'profile', 'username': '%%'})
+msgs['allclans'] = json.dumps({"start":0,"type":"page","page":"clans"})
 
 clan = None
 treas = None
 members = None
 donations = None
 profiles = dict()
+otherclans = [None, None, None]
 
 battles = 0
 for event in ws:
@@ -221,7 +231,30 @@ for event in ws:
 
                     #check for termination
                     if len(profiles) == clan['members']:
-                        ws.close()
+                        sleep(1)
+                        print('Getting level information on surrounding clans')
+                        ws.send_text(msgs['allclans'])
+
+        if isinstance(event, events.Text):
+            j = json.loads(event.text)[0]
+            if 'type' in j:
+                if (j['type'] == 'page') and (j['page'] == 'clans'):
+                    print("Processing surrounding clan levels")
+                    r = j['result']
+                    maxidx = r['ct']-1
+                    idx = None
+                    for i in range(len(r['cl'])):
+                        if r['cl'][i]['id'] == r['c']['id']:
+                            print("Found our clan at position {} in the list".format(i))
+                            idx = i
+                            break
+                    otherclans[1] = r['cl'][idx]['level'] + (r['cl'][idx]['level_percent']/100)
+                    if idx > 0:
+                        otherclans[0] = r['cl'][idx-1]['level'] + (r['cl'][idx-1]['level_percent']/100)
+                    if idx < maxidx:
+                        otherclans[2] = r['cl'][idx+1]['level'] + (r['cl'][idx+1]['level_percent']/100)
+
+                    ws.close()
 
     except Exception as ex:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -268,6 +301,10 @@ try:
             k = member['username']
             for s in skills:
                 c.execute("REPLACE INTO ranks (userid, username, skill, level, rank) VALUES (?, ?, ?, ?, ?)", (int(member['userid']), k, s[0], profiles[k][s[2]], profiles[k][s[1]]))
+
+    #nearestclans
+    c.execute("REPLACE INTO nearestclans (datestamp, above, ours, below) VALUES (date('now'), ?, ?, ?)", (otherclans[0], otherclans[1], otherclans[2]))
+
 except Exception as e:
     conn.rollback()
     c.close()
