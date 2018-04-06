@@ -75,5 +75,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ToDo
 
+  - [ ] Make it possible to only display the last X number of days of data.
   - [ ] Make `index.html` update the captions based on settings.
   - [X] Fix the code so it ignores applicants.
