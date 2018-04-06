@@ -25,12 +25,13 @@ c = conn.cursor()
 try:
     c.execute('''
         CREATE TABLE IF NOT EXISTS market (
-            tid INTEGER PRIMARY KEY,
+            tid INTEGER,
             datestamp STRING,
-            resource INTEGER,
+            resource STRING,
             quantity INTEGER,
             price INTEGER,
-            seller STRING
+            seller STRING,
+            PRIMARY KEY (tid, datestamp)
         );
     ''')
     c.execute('CREATE INDEX IF NOT EXISTS market_datestamp_idx on market (datestamp);')
@@ -152,6 +153,55 @@ try:
     for resource in resources.keys():
         for rec in resources[resource].values():
             c.execute("INSERT INTO market (tid, datestamp, resource, quantity, price, seller) VALUES (?, date('now'), ?, ?, ?, ?)", (rec['tid'], rec['n'], rec['v'], rec['price'], rec['seller']))
+
+    #convert singular to plural
+    pairs = [
+        ('aberration mind source', 'aberration mind sources'),
+        ('animal eye', 'animal eyes'),
+        ('animal tooth', 'animal teeth'),
+        ('animal tongue', 'animal tongues'),
+        ('animal wing', 'animal wings'),
+        ('beast fur', 'beast furs'),
+        ('beast limb', 'beast limbs'),
+        ('beast tooth', 'beast teeth'),
+        ('beast wing', 'beast wings'),
+        ('bird nest', 'bird nests'),
+        ('bone shard', 'bone shards'),
+        ('chunk of coal', 'chunks of coal'),
+        ('chunk of graphite', 'chunks of graphite'),
+        ('construct power', 'construct powers'),
+        ('copper ore', 'copper ores'),
+        ('crystal', 'crystals'),
+        ('dragon eye', 'dragon eyes'),
+        ('dragon scale', 'dragon scales'),
+        ('dragon tail', 'dragon tails'),
+        ('fish fin', 'fish fins'),
+        ('golden apple', 'golden apples'),
+        ('honeycomb', 'honeycombs'),
+        ('humanoid bone', 'humanoid bones'),
+        ('humanoid flesh', 'humanoid fleshes'),
+        ('humanoid limb', 'humanoid limbs'),
+        ('lucky coin', 'lucky coins'),
+        ('magical stone', 'magical stones'),
+        ('octopus ink', 'octopus inks'),
+        ('ooze gel', 'ooze gels'),
+        ('plant branch', 'plant branches'),
+        ('plant root', 'plant roots'),
+        ('plant vine', 'plant vines'),
+        ('protection stone', 'protection stones'),
+        ('rainbow shard', 'rainbow shards'),
+        ('rune stone', 'rune stones'),
+        ('serpent eye', 'serpent eyes'),
+        ('serpent tail', 'serpent tails'),
+        ('serpent tongue', 'serpent tongues'),
+        ('squid tentacle', 'squid tentacles'),
+        ('turtle shell', 'turtle shells'),
+        ('vermin eye', 'vermin eyes'),
+        ('vermin tooth', 'vermin teeth'),
+        ('yellow pollen', 'yellow pollens')
+    ]
+    for pair in pairs:
+        c.execute("UPDATE market SET resource=? WHERE resource=?", (pair[1], pair[0]))
 
 except Exception as e:
     conn.rollback()

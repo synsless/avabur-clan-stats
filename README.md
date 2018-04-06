@@ -62,7 +62,12 @@ The current version displays the following graphs and tables:
 
 ## Optional Components
 
-I've added `market.py`, which collects all the market entries except those for weapons, armour, and gems. Right now there is no script to munge that data, but I'll come up with that soon enough. For now you can at least store that data, if you want it. If you don't, just don't execute this script.
+I've added `market.py`, which collects all the market entries except those for weapons, armour, and gems. It works just like `collect.py` does. That also means it only collects data once a day. If you want something that monitors more frequently than that, you'll have to make some adjustments to the database and code.
+
+* You need to add a `marketdir` setting to the `settings.json` file that points to where your market files will live.
+* You need to run `market.py` periodically.
+* You need to run `rendermarket.py` afterwards to generate the data file.
+* Put `market.html` in the folder pointed to by `marketdir` and enjoy!
 
 ## License
 

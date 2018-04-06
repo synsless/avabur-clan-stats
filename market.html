@@ -1,0 +1,126 @@
+<html lang="en">
+<!-- https://stackoverflow.com/questions/41403997/javascript-highcharts-change-chart-data-by-dropdown -->
+<!-- https://jsfiddle.net/wg5jafqt/3/ -->
+	<head>
+		<title>Necropolis Clan: Historical Market Stats</title>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+		<script type="text/javascript" src="https://code.highcharts.com/modules/data.js"></script>
+		<script type="text/javascript" src="https://code.highcharts.com/modules/exporting.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+		<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+		<style type="text/css">
+			h1 {
+				text-align: center;
+				padding-bottom: 1em;
+			}
+			button {
+				font-size: smaller;
+			}
+			caption {
+				font-weight: bolder;
+			}
+		</style>
+
+		<script>
+			function buildArray(lst) {
+				var str = "Date,Inventory,Minimum Price,Mean Price,P10 Price,P50 Price,P90 Price\n";
+				for (var i = 0; i < lst.length; i++) {
+					var rec = lst[i];
+					str += rec['date'] + ',' + rec['inventory'] + ',' + rec['minprice'] + ',' + rec['mean'] + ',' + rec['p10'] + ',' + rec['p50'] + ',' + rec['p90'] + "\n";
+				}
+				return str;
+			}
+
+			var chartdata;
+			var chart;
+			var dataOptions;
+			$(document).ready( function () {
+				$.getJSON("market.json", function(json) {
+					chartdata = json;
+					dataOptions = {
+						chart: {
+							renderTo: 'graph',
+							type: 'line'
+						},
+						xAxis: {
+							type: 'datetime'
+						},
+						subtitle: {
+							text: "(Click on the legend to hide/show different data)"
+						}
+					}
+
+					//Populate select box
+					select = document.getElementById('resource');
+					var resources = Object.keys(chartdata).sort();
+					for (var i=0, len=resources.length; i<len; i++) {
+						var opt = document.createElement('option');
+						opt.value = resources[i];
+						opt.innerHTML = resources[i];
+						if (resources[i] === 'crystals') {
+							opt.selected = 'selected';
+						}
+						select.appendChild(opt);
+					}
+
+					//Preload the 'crystals' chart
+					dataOptions.data = {csv: buildArray(chartdata['crystals'])};
+					dataOptions.title = {text: 'crystals'};
+					chart = new Highcharts.Chart(dataOptions);
+				});
+				$(document).on('click', '#hide-all', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+				$("#resource").change(function() {
+					var selVal = $("#resource").val();
+					dataOptions.data = {csv: buildArray(chartdata[selVal])};
+					dataOptions.title = {text: selVal};
+					chart = new Highcharts.Chart(dataOptions);
+				});
+			} );
+		</script>
+	</head>
+	<body>
+		<div id="container">
+			<div class="row">
+				<div class="col-md-10 offset-md-1">
+					<h1>Necropolis Clan: Historical Market Stats</h1>
+					<p style="text-align: center">
+						Data is collected daily at 9 p.m. server time; the graphs are updated shortly thereafter.
+					</p>
+						<dl>
+							<dt>Inventory</dt>
+							<dd>The total amount of the resource on the market.</dd>
+							<dt>Minimum price</dt>
+							<dd>Exactly that.</dd>
+							<dt>Mean price</dt>
+							<dd>The weighted average price</dd>
+							<dt>P10, P50, P90</dt>
+							<dd>Percentiles (weighted). P50 is the median price. P10 is the price below which 10 percent of the resources are being sold for. P90 is the price below which 90 percent of the resources are being sold for.</dd>
+						</dl>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-10 offset-md-1">
+					<select id="resource">
+					</select>
+					<div id="graph"></div>
+					<button id="show-all">Show All</button>
+					<button id="hide-all">Hide All</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
