@@ -29,9 +29,22 @@
 		<script>
 			function buildArray(lst) {
 				var str = "Date,Inventory,Minimum Price,Mean Price,P10 Price,P50 Price,P90 Price\n";
+				var vals
 				for (var i = 0; i < lst.length; i++) {
 					var rec = lst[i];
 					str += rec['date'] + ',' + rec['inventory'] + ',' + rec['minprice'] + ',' + rec['mean'] + ',' + rec['p10'] + ',' + rec['p50'] + ',' + rec['p90'] + "\n";
+				}
+				return str;
+			}
+
+			function buildCompareResources(data, key) {
+				var str = "Date,Food,Wood,Iron,Stone\n";
+				var food = data['food'];
+				var wood = data['wood'];
+				var iron = data['iron'];
+				var stone = data['stone'];
+				for (var i = 0; i < food.length; i++) {
+					str += food[i]['date'] + ',' + food[i][key] + ',' + wood[i][key] + ',' + iron[i][key] + ',' + stone[i][key] + "\n";
 				}
 				return str;
 			}
@@ -85,8 +98,22 @@
 				});
 				$("#resource").change(function() {
 					var selVal = $("#resource").val();
-					dataOptions.data = {csv: buildArray(chartdata[selVal])};
-					dataOptions.title = {text: selVal};
+					if (selVal === '_resources_inventory') {
+						dataOptions.data = {csv: buildCompareResources(chartdata, 'inventory')};
+						dataOptions.title = {text: "Resource Inventories"};
+					} else if (selVal === '_resources_min') {
+						dataOptions.data = {csv: buildCompareResources(chartdata, 'minprice')};
+						dataOptions.title = {text: "Resource Minimum Prices"};
+					} else if (selVal === '_resources_mean') {
+						dataOptions.data = {csv: buildCompareResources(chartdata, 'mean')};
+						dataOptions.title = {text: "Resource Mean Prices"};
+					} else if (selVal === '_resources_p50') {
+						dataOptions.data = {csv: buildCompareResources(chartdata, 'p50')};
+						dataOptions.title = {text: "Resource P50 Prices"};
+					} else {
+						dataOptions.data = {csv: buildArray(chartdata[selVal])};
+						dataOptions.title = {text: selVal};
+					}
 					chart = new Highcharts.Chart(dataOptions);
 				});
 			} );
@@ -102,7 +129,7 @@
 					</p>
 						<dl>
 							<dt>Inventory</dt>
-							<dd>The total amount of the resource on the market.</dd>
+							<dd>The total amount of the resource on the market. Low inventory levels can lead to weird price distribution.</dd>
 							<dt>Minimum price</dt>
 							<dd>Exactly that.</dd>
 							<dt>Mean price</dt>
@@ -115,6 +142,10 @@
 			<div class="row">
 				<div class="col-md-8 offset-md-2">
 					<select id="resource">
+						<option value="_resources_inventory">_RESOURCES_INVENTORY</option>
+						<option value="_resources_min">_RESOURCES_MIN_PRICE</option>
+						<option value="_resources_mean">_RESOURCES_MEAN_PRICE</option>
+						<option value="_resources_p50">_RESOURCES_MEDIAN_PRICE</option>
 					</select>
 					<div id="graph"></div>
 					<button id="show-all">Show All</button>
