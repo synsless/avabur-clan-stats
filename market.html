@@ -49,6 +49,42 @@
 				return str;
 			}
 
+			function buildCompareIngredients(data, field) {
+				var noningreds = ['crystals', 'platinum', 'food', 'wood', 'iron', 'stone', 'crafting materials', 'gem fragments'];
+				//build header
+				var str = "Date";
+				var keys = Array.from(Object.keys(data)).sort();
+				for (var i=0; i<keys.length; i++) {
+					key = keys[i]
+					if ( (! key.startsWith("_")) && (noningreds.indexOf(key) < 0) ){
+						str += ','+key;
+					}
+				}
+				str += "\n";
+
+				//build data
+				for (var i=0; i<data['_dates'].length; i++) {
+					var targetdate = data['_dates'][i];
+					var node = targetdate+'';
+					for (var j=0; j<keys.length; j++) {
+						key = keys[j];
+						if ( (! key.startsWith("_")) && (noningreds.indexOf(key) < 0) ){
+							node += ',';
+							for (var k=0; k<data[key].length; k++) {
+								var rec = data[key][k];
+								if (rec['date'] === targetdate) {
+									node += rec[field];
+									break;
+								}
+							}
+						}
+					}
+					node += "\n";
+					str += node;
+				}
+				return str;
+			}
+
 			var chartdata;
 			var chart;
 			var dataOptions;
@@ -72,13 +108,16 @@
 					select = document.getElementById('resource');
 					var resources = Object.keys(chartdata).sort();
 					for (var i=0, len=resources.length; i<len; i++) {
-						var opt = document.createElement('option');
-						opt.value = resources[i];
-						opt.innerHTML = resources[i];
-						if (resources[i] === 'crystals') {
-							opt.selected = 'selected';
+						var val = resources[i];
+						if (! val.startsWith("_")) {
+							var opt = document.createElement('option');
+							opt.value = val;
+							opt.innerHTML = val;
+							if (val === 'crystals') {
+								opt.selected = 'selected';
+							}
+							select.appendChild(opt);
 						}
-						select.appendChild(opt);
 					}
 
 					//Preload the 'crystals' chart
@@ -110,6 +149,30 @@
 					} else if (selVal === '_resources_p50') {
 						dataOptions.data = {csv: buildCompareResources(chartdata, 'p50')};
 						dataOptions.title = {text: "Resource P50 Prices"};
+					} else if (selVal === '_resources_p10') {
+						dataOptions.data = {csv: buildCompareResources(chartdata, 'p10')};
+						dataOptions.title = {text: "Resource P10 Prices"};
+					} else if (selVal === '_resources_p90') {
+						dataOptions.data = {csv: buildCompareResources(chartdata, 'p90')};
+						dataOptions.title = {text: "Resource P90 Prices"};
+					} else if (selVal === '_ingredients_inventory') {
+						dataOptions.data = {csv: buildCompareIngredients(chartdata, 'inventory')};
+						dataOptions.title = {text: "Ingredient Inventories"};
+					} else if (selVal === '_ingredients_min') {
+						dataOptions.data = {csv: buildCompareIngredients(chartdata, 'minprice')};
+						dataOptions.title = {text: "Ingredient Minimum Prices"};
+					} else if (selVal === '_ingredients_mean') {
+						dataOptions.data = {csv: buildCompareIngredients(chartdata, 'mean')};
+						dataOptions.title = {text: "Ingredient Mean Prices"};
+					} else if (selVal === '_ingredients_p50') {
+						dataOptions.data = {csv: buildCompareIngredients(chartdata, 'p50')};
+						dataOptions.title = {text: "Ingredient P50 Prices"};
+					} else if (selVal === '_ingredients_p10') {
+						dataOptions.data = {csv: buildCompareIngredients(chartdata, 'p10')};
+						dataOptions.title = {text: "Ingredient P10 Prices"};
+					} else if (selVal === '_ingredients_p90') {
+						dataOptions.data = {csv: buildCompareIngredients(chartdata, 'p90')};
+						dataOptions.title = {text: "Ingredient P90 Prices"};
 					} else {
 						dataOptions.data = {csv: buildArray(chartdata[selVal])};
 						dataOptions.title = {text: selVal};
@@ -125,7 +188,8 @@
 				<div class="col-md-8 offset-md-2">
 					<h1>Necropolis Clan: Historical Market Stats</h1>
 					<p style="text-align: center">
-						Data is collected daily at 9 p.m. server time; the graphs are updated shortly thereafter.
+						Data is collected daily at 9 p.m. server time; the graphs are updated shortly thereafter.<br>
+						<a href="..">Clan Stats</a>
 					</p>
 						<dl>
 							<dt>Inventory</dt>
@@ -133,9 +197,15 @@
 							<dt>Minimum price</dt>
 							<dd>Exactly that.</dd>
 							<dt>Mean price</dt>
-							<dd>The weighted average price</dd>
+							<dd>The weighted average price.</dd>
 							<dt>P10, P50, P90</dt>
-							<dd>Percentiles (weighted). P50 is the median price. P10 is the price below which 10 percent of the resources are being sold for. P90 is the price below which 90 percent of the resources are being sold for.</dd>
+							<dd>Percentiles (weighted). 
+								<ul>
+									<li>P50 is the median price (the price in the very middle of the sorted list).</li>
+									<li>P10 is the price below which 10 percent of the resources are being sold for. (Higher than the minimum price, but still really low.)</li>
+									<li>P90 is the price below which 90 percent of the resources are being sold for. (A high price, but hopefully cutting out the real outliers at the top.)</li>
+								</ul>
+							</dd>
 						</dl>
 				</div>
 			</div>
@@ -145,7 +215,15 @@
 						<option value="_resources_inventory">_RESOURCES_INVENTORY</option>
 						<option value="_resources_min">_RESOURCES_MIN_PRICE</option>
 						<option value="_resources_mean">_RESOURCES_MEAN_PRICE</option>
-						<option value="_resources_p50">_RESOURCES_MEDIAN_PRICE</option>
+						<option value="_resources_p10">_RESOURCES_P10_PRICE</option>
+						<option value="_resources_p50">_RESOURCES_P50_PRICE</option>
+						<option value="_resources_p90">_RESOURCES_P90_PRICE</option>
+						<option value="_ingredients_inventory">_INGREDIENTS_INVENTORY</option>
+						<option value="_ingredients_min">_INGREDIENTS_MIN_PRICE</option>
+						<option value="_ingredients_mean">_INGREDIENTS_MEAN_PRICE</option>
+						<option value="_ingredients_p10">_INGREDIENTS_P10_PRICE</option>
+						<option value="_ingredients_p50">_INGREDIENTS_P50_PRICE</option>
+						<option value="_ingredients_p90">_INGREDIENTS_P90_PRICE</option>
 					</select>
 					<div id="graph"></div>
 					<button id="show-all">Show All</button>

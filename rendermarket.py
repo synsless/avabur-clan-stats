@@ -82,10 +82,14 @@ for r in resources:
         node.append(entry)
     data[r] = node
 
+#Get list of distinct dates
+c.execute("SELECT DISTINCT(datestamp) FROM market ORDER BY datestamp")
+data['_dates'] = [x[0] for x in c.fetchall()]
+
 c.close()
 conn.close()
 
-#produce the CSV
+#produce the JSON
 with open(os.path.join(settings['marketdir'], 'market.json'), 'w', newline='') as outfile:
     json.dump(data, outfile)
 
