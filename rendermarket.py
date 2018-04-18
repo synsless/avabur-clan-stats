@@ -93,6 +93,5 @@ conn.close()
 with open(os.path.join(settings['marketdir'], 'market.json'), 'w', newline='') as outfile:
     json.dump(data, outfile)
 
-print("Done.")
 
 

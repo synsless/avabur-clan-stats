@@ -6,6 +6,21 @@ import csv
 import os
 import math
 
+def level2xp(lvl):
+    #up to level 111
+    xptiers = [20000, 121678, 350851, 745429, 1339951, 2167182, 3258923, 4646498, 6361081, 8433930, 10896556, 13780871, 17119294, 20944855, 25291273, 30193033, 35685457, 41804763, 48588126, 56073734, 64300844, 73309830, 83142239, 93840842, 105449680, 118014118, 131580895, 146198170, 161915581, 178784289, 196857031, 216188176, 236833776, 258851620, 282301291, 307244220, 333743747, 361865174, 391675830, 423245132, 456644644, 491948143, 529231687, 568573676, 610054927, 653758741, 699770974, 748180144, 799077355, 852556671, 908714903, 967651833, 1029470270, 1094276137, 1162178557, 1233289942, 1307726087, 1385606263, 1467053316, 1552193763, 1641157895, 1734079883, 1831097884, 1932354148, 2037995137, 2148171633, 2263038863, 2382000000, 2507000000, 2637406405, 2772681975, 2913495393, 3060031195, 3212479279, 3371035044, 3535899544, 3707279636, 3885388140, 4070443993, 4262672421, 4462305102, 4669580337, 4884743233, 5108045881, 5339747538, 5580114827, 5829421923, 6087950759, 6355991231, 6633841407, 6921807744, 7220205308, 7529358005, 7849598808, 8181270001, 8524723420, 8880320706, 9248433560, 9629444009, 10023744672, 10431739043, 10853841770, 11290478946, 11742088411, 12209120054, 12692036127, 13191311569, 13707434329, 14240905711, 14792240714, 15361968389]
+    assert(len(xptiers) == 111)
+    whole = math.floor(lvl)
+    decimal = lvl - whole
+    
+    # print("Level: {}, Whole: {}, Decimal: {}".format(lvl, whole, decimal))
+    xp = 0
+    for i in range(whole):
+        # print("\tAdding xp for lvl {}".format(i+1))
+        xp += xptiers[i]
+    xp += int(round(xptiers[whole] * decimal))
+    return xp
+
 def calcDeltas(lst):
     if lst == None:
         return None
@@ -86,6 +101,7 @@ totals = [x[1] for x in recs]
 counts = [x[2] for x in recs]
 deltas = calcDeltas(totals)
 avgs = [round(deltas[i] / counts[i]) for i in range(len(deltas))]
+# avgs = [round(totals[i] / counts[i]) for i in range(len(totals))]
 
 ## Try to trim really wide swings
 actions_total_whatiswide = 500000
@@ -271,6 +287,8 @@ for u in usernames:
     deltas = calcDeltas(counts)
     deltadata[u] = buildData(dates, deltas)
 
+xpdates = list()
+xpdeltas = list()
 ## Now convert that into a format suitable for CSV output (rows are dates, users are columns)
 ## This uses a number nested loops. It's not the most efficient, but it's good enough.
 csvout = []
@@ -278,6 +296,8 @@ csvout.append(['Date'] + usernames)
 ### This gives us the row structure
 for d in alldates:
     row = [d]
+    xpdates.append(d)
+    node = 0
     ### This loop ensures the correct order
     for u in usernames:
         ### Look at each delta entry for the given user and see if it matches the date.
@@ -286,15 +306,25 @@ for d in alldates:
             if (delta[0] == d):
                 found = True
                 row.append(delta[1])
+                node += delta[1]
                 break
         if not found:
             row.append(None)
+    xpdeltas.append(node)
     csvout.append(row)
 
 ## Print it!
 with open(os.path.join(settings['csvdir'], 'individual_xpdonated.csv'), 'w', newline='') as csvfile:
     csvw = csv.writer(csvfile, dialect=csv.excel)
     for row in csvout:
+        csvw.writerow(row)
+
+## Now overwrite the clan xp gain with aggregate xp donations
+xpdata = buildData(xpdates, xpdeltas)
+with open(os.path.join(settings['csvdir'], 'clan_xp.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Date", "Experience Gain"])
+    for row in xpdata:
         csvw.writerow(row)
 
 #per-user gold donations
@@ -524,22 +554,178 @@ with open(os.path.join(settings['csvdir'], 'ranks.json'), 'w', newline='') as cs
     json.dump(ranks, csvfile)
 
 #Nearest clans
-data = list()
+lvldata = list()
+xpdata = list()
 for row in c.execute("SELECT datestamp, ours, above, below FROM nearestclans ORDER BY datestamp"):
-    node = [row[0]]
+    lvlnode = [row[0]]
+    xpnode = [row[0]]
     if row[2] is not None:
-        node.append(abs(row[1] - row[2]))
+        lvlnode.append(abs(row[1] - row[2]))
+        xpnode.append(abs(level2xp(row[1]) - level2xp(row[2])))
     else:
-        node.append(0)
+        lvlnode.append(None)
+        xpnode.append(None)
     if row[3] is not None:
-        node.append(abs(row[1] - row[3]))
+        lvlnode.append(abs(row[1] - row[3]))
+        xpnode.append(abs(level2xp(row[1]) - level2xp(row[3])))
     else:
-        node.append(0)
-    data.append(node)
-with open(os.path.join(settings['csvdir'], 'clan_nearest.csv'), 'w', newline='') as csvfile:
+        lvlnode.append(None)
+        xpnode.append(None)
+    lvldata.append(lvlnode)
+    xpdata.append(xpnode)
+with open(os.path.join(settings['csvdir'], 'clan_nearest_lvl.csv'), 'w', newline='') as csvfile:
     csvw = csv.writer(csvfile, dialect=csv.excel)
     csvw.writerow(["Date","Above", "Below"])
-    for row in data:
+    for row in lvldata:
+        csvw.writerow(row)
+with open(os.path.join(settings['csvdir'], 'clan_nearest_xp.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    csvw.writerow(["Date","Above", "Below"])
+    for row in xpdata:
+        csvw.writerow(row)
+
+#Kill-to-death ratio
+## First get maxdate
+c.execute("SELECT MAX(datestamp) FROM members")
+maxdate = c.fetchone()[0]
+
+## Get list of current members
+c.execute("SELECT DISTINCT(username) FROM members WHERE datestamp=? ORDER BY username COLLATE NOCASE", [maxdate])
+usernames = [x[0] for x in c.fetchall()]
+
+## Get list of distinct dates
+c.execute("SELECT DISTINCT(datestamp) FROM members ORDER BY datestamp")
+alldates = [x[0] for x in c.fetchall()]
+alldates.pop(0)
+
+## Now get their total action data
+rawkills = dict()
+rawdeaths = dict()
+for u in usernames:
+    rawkills[u] = list()
+    rawdeaths[u] = list()
+    for row in c.execute("SELECT datestamp, kills, deaths FROM members WHERE username=?", [u]):
+        rawkills[u].append((row[0], row[1]))
+        rawdeaths[u].append((row[0], row[2]))
+
+## Now turn that into deltas for each user
+kdeltadata = dict()
+ddeltadata = dict()
+kdratio = dict()
+kdpercent = dict()
+for u in usernames:
+    kdates = [x[0] for x in rawkills[u]]
+    kcounts = [x[1] for x in rawkills[u]]
+    ddates = [x[0] for x in rawdeaths[u]]
+    dcounts = [x[1] for x in rawdeaths[u]]
+    kdeltas = calcDeltas(kcounts)
+    ddeltas = calcDeltas(dcounts)
+    avgnode = list()
+    kdpnode = list()
+    for i in range(len(kdeltas)):
+        avg = None
+        kdp = None
+        if ddeltas[i] > 0:
+            avg = kdeltas[i] / ddeltas[i]
+        avgnode.append(avg)
+        if (kdeltas[i] + ddeltas[i]) > 0:
+            kdp = kdeltas[i] / (kdeltas[i] + ddeltas[i])
+        kdpnode.append(kdp)
+    kdeltadata[u] = buildData(kdates, kdeltas)
+    ddeltadata[u] = buildData(ddates, ddeltas)
+    kdratio[u] = buildData(kdates, avgnode)
+    kdpercent[u] = buildData(kdates, kdpnode)
+
+## Now convert that into a format suitable for CSV output (rows are dates, users are columns)
+## This uses a number nested loops. It's not the most efficient, but it's good enough.
+kcsvout = []
+kcsvout.append(['Date'] + usernames)
+### This gives us the row structure
+for d in alldates:
+    row = [d]
+    ### This loop ensures the correct order
+    for u in usernames:
+        ### Look at each delta entry for the given user and see if it matches the date.
+        found = False
+        for delta in kdeltadata[u]:
+            if (delta[0] == d):
+                found = True
+                row.append(delta[1])
+                break
+        if not found:
+            row.append(None)
+    kcsvout.append(row)
+
+dcsvout = []
+dcsvout.append(['Date'] + usernames)
+### This gives us the row structure
+for d in alldates:
+    row = [d]
+    ### This loop ensures the correct order
+    for u in usernames:
+        ### Look at each delta entry for the given user and see if it matches the date.
+        found = False
+        for delta in ddeltadata[u]:
+            if (delta[0] == d):
+                found = True
+                row.append(delta[1])
+                break
+        if not found:
+            row.append(None)
+    dcsvout.append(row)
+
+kdcsvout = []
+kdcsvout.append(['Date'] + usernames)
+### This gives us the row structure
+for d in alldates:
+    row = [d]
+    ### This loop ensures the correct order
+    for u in usernames:
+        ### Look at each delta entry for the given user and see if it matches the date.
+        found = False
+        for delta in kdratio[u]:
+            if (delta[0] == d):
+                found = True
+                row.append(delta[1])
+                break
+        if not found:
+            row.append(None)
+    kdcsvout.append(row)
+
+kdpcsvout = []
+kdpcsvout.append(['Date'] + usernames)
+### This gives us the row structure
+for d in alldates:
+    row = [d]
+    ### This loop ensures the correct order
+    for u in usernames:
+        ### Look at each delta entry for the given user and see if it matches the date.
+        found = False
+        for delta in kdpercent[u]:
+            if (delta[0] == d):
+                found = True
+                row.append(delta[1])
+                break
+        if not found:
+            row.append(None)
+    kdpcsvout.append(row)
+
+## Print it!
+with open(os.path.join(settings['csvdir'], 'individual_kills.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    for row in kcsvout:
+        csvw.writerow(row)
+with open(os.path.join(settings['csvdir'], 'individual_deaths.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    for row in dcsvout:
+        csvw.writerow(row)
+with open(os.path.join(settings['csvdir'], 'individual_kdratio.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    for row in kdcsvout:
+        csvw.writerow(row)
+with open(os.path.join(settings['csvdir'], 'individual_kdpercent.csv'), 'w', newline='') as csvfile:
+    csvw = csv.writer(csvfile, dialect=csv.excel)
+    for row in kdpcsvout:
         csvw.writerow(row)
 
 c.close()

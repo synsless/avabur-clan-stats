@@ -27,6 +27,7 @@ try:
         CREATE TABLE IF NOT EXISTS clan (
             datestamp STRING PRIMARY KEY,
             xp INTEGER,
+            level INTEGER,
             crystals INTEGER,
             platinum INTEGER,
             gold INTEGER,
@@ -245,7 +246,7 @@ for event in ws:
                     idx = None
                     for i in range(len(r['cl'])):
                         if r['cl'][i]['id'] == r['c']['id']:
-                            print("Found our clan at position {} in the list".format(i))
+                            print("Found our clan at position {} in the list".format(i+1))
                             idx = i
                             break
                     otherclans[1] = r['cl'][idx]['level'] + (r['cl'][idx]['level_percent']/100)
@@ -268,7 +269,7 @@ print("Data fetched")
 c = conn.cursor()
 try:
     #clan
-    c.execute("REPLACE INTO clan (datestamp, xp, crystals, platinum, gold, food, wood, iron, stone) VALUES (date('now'), ?, ?, ?, ?, ?, ?, ?, ?)", (clan['experience'], treas['crystals'], treas['platinum'], treas['gold'], treas['food'], treas['wood'], treas['iron'], treas['stone']))
+    c.execute("REPLACE INTO clan (datestamp, xp, level, crystals, platinum, gold, food, wood, iron, stone) VALUES (date('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)", (clan['experience'], clan['level'], treas['crystals'], treas['platinum'], treas['gold'], treas['food'], treas['wood'], treas['iron'], treas['stone']))
     #members
     for member in members['members']:
         if int(member['rankid']) >= 0:

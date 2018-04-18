@@ -44,7 +44,8 @@
 			            text: 'Daily XP Gain'
 			        },
 			        subtitle: {
-			        	text: "(Days we level aren't shown, and the day after we level will be abnormally low)"
+			        	// text: "(Days we level aren't shown, and the day after we level will be abnormally low)"
+			        	text: "(The sum of xp donations; inaccurate when membership changes)"
 			        }
 			    });
 			});
@@ -232,6 +233,128 @@
 					});
 				});
 			});
+			$.get('individual_kills.csv', function(csv) {
+			    $('#individual_kills').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Kills'
+			        },
+			        subtitle: {
+			        	text: '(Obviously fluxuates as you change MOB)'
+			        }
+			    });
+				var chart = $('#individual_kills').highcharts();
+				$(document).on('click', '#hide-all-kills', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-kills', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+			$.get('individual_deaths.csv', function(csv) {
+			    $('#individual_deaths').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Deaths'
+			        },
+			        subtitle: {
+			        	text: '(Obviously fluxuates as you change MOB)'
+			        }
+			    });
+				var chart = $('#individual_deaths').highcharts();
+				$(document).on('click', '#hide-all-deaths', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-deaths', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+			$.get('individual_kdratio.csv', function(csv) {
+			    $('#individual_kdratio').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        plotOptions: {
+			        	series: {
+			        		connectNulls: true
+			        	}
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Kill-Death Ratio'
+			        },
+			        subtitle: {
+			        	text: '(Obviously fluxuates as you change MOB; higher is better)'
+			        }
+			    });
+				var chart = $('#individual_kdratio').highcharts();
+				$(document).on('click', '#hide-all-kdratio', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-kdratio', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
+			$.get('individual_kdpercent.csv', function(csv) {
+			    $('#individual_kdpercent').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        plotOptions: {
+			        	series: {
+			        		connectNulls: true
+			        	}
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'Individual Win Rates'
+			        },
+			        subtitle: {
+			        	text: '(Obviously fluxuates as you change MOB; higher is better)'
+			        }
+			    });
+				var chart = $('#individual_kdpercent').highcharts();
+				$(document).on('click', '#hide-all-kdpercent', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-kdpercent', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
 			$.get('individual_golddonated.csv', function(csv) {
 			    $('#individual_golddonated').highcharts({
 			        chart: {
@@ -405,8 +528,8 @@
 			        }
 			    });
 			});
-			$.get('clan_nearest.csv', function(csv) {
-			    $('#clan_nearest').highcharts({
+			$.get('clan_nearest_lvl.csv', function(csv) {
+			    $('#clan_nearest_lvl').highcharts({
 			        chart: {
 			            type: 'line'
 			        },
@@ -421,19 +544,49 @@
 			        	text: 'The "Above" line should be sloping towards zero. The "Below" line should be sloping towards infinity.'
 			        }
 			    });
-				var chart = $('#clan_nearest').highcharts();
-				$(document).on('click', '#hide-all-nc', function() {
+				var chart = $('#clan_nearest_lvl').highcharts();
+				$(document).on('click', '#hide-all-ncl', function() {
 					$.each(chart.series, function(i, ser) {
 						ser.hide();
 					});
 				});
-				$(document).on('click', '#show-all-nc', function() {
+				$(document).on('click', '#show-all-ncl', function() {
 					$.each(chart.series, function(i, ser) {
 						ser.show();
 					});
 				});
 			});
-
+			$.get('clan_nearest_xp.csv', function(csv) {
+			    $('#clan_nearest_xp').highcharts({
+			        chart: {
+			            type: 'line'
+			        },
+			        data: {
+			            csv: csv,
+			            dateFormat: 'YYYY/mm/dd'
+			        },
+			        title: {
+			            text: 'XP Difference With Nearest Clans'
+			        },
+			        subtitle: {
+			        	text: 'This is the more accurate graph'
+			        },
+			        credits: {
+			        	text: 'The "Above" line should be sloping towards zero. The "Below" line should be sloping towards infinity.'
+			        }
+			    });
+				var chart = $('#clan_nearest_xp').highcharts();
+				$(document).on('click', '#hide-all-ncx', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.hide();
+					});
+				});
+				$(document).on('click', '#show-all-ncx', function() {
+					$.each(chart.series, function(i, ser) {
+						ser.show();
+					});
+				});
+			});
 			$(document).ready( function () {
 				$('#ranktable').DataTable( {
 					'ajax': 'ranks.json',
@@ -461,9 +614,6 @@
 			</div>
 			<div class="row">
 				<div class="col">
-					<div id="clan_actions_avg"></div>
-				</div>
-				<div class="col">
 					<div id="individual_actions"></div>
 					<button id="show-all-acts">Show All</button>
 					<button id="hide-all-acts">Hide All</button>
@@ -481,24 +631,14 @@
 			</div>
 			<div class="row">
 				<div class="col">
-					<div id="clan_donations_plat"></div>
+					<div id="individual_golddonated"></div>
+					<button id="show-all-gold">Show All</button>
+					<button id="hide-all-gold">Hide All</button>
 				</div>
 				<div class="col">
 					<div id="individual_platdonated"></div>
 					<button id="show-all-plat">Show All</button>
 					<button id="hide-all-plat">Hide All</button>
-				</div>
-			</div>
-			<div class="row">
-			</div>
-			<div class="row">
-				<div class="col">
-					<div id="clan_donations_gold"></div>
-				</div>
-				<div class="col">
-					<div id="individual_golddonated"></div>
-					<button id="show-all-gold">Show All</button>
-					<button id="hide-all-gold">Hide All</button>
 				</div>
 			</div>
 			<div class="row">
@@ -524,15 +664,48 @@
 					<button id="show-all-treas">Show All</button>
 					<button id="hide-all-treas">Hide All</button>
 				</div>
+			</div>
+			<div class="row">
 				<div class="col">
-					<div id="clan_nearest"></div>
-					<button id="show-all-nc">Show All</button>
-					<button id="hide-all-nc">Hide All</button>
+					<div id="clan_nearest_lvl"></div>
+					<button id="show-all-ncl">Show All</button>
+					<button id="hide-all-ncl">Hide All</button>
+				</div>
+				<div class="col">
+					<div id="clan_nearest_xp"></div>
+					<button id="show-all-ncx">Show All</button>
+					<button id="hide-all-ncx">Hide All</button>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
 					<div id="individual_ratios"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_kills"></div>
+					<button id="show-all-kills">Show All</button>
+					<button id="hide-all-kills">Hide All</button>
+				</div>
+				<div class="col">
+					<div id="individual_deaths"></div>
+					<button id="show-all-deaths">Show All</button>
+					<button id="hide-all-deaths">Hide All</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_kdratio"></div>
+					<button id="show-all-kdratio">Show All</button>
+					<button id="hide-all-kdratio">Hide All</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div id="individual_kdpercent"></div>
+					<button id="show-all-kdpercent">Show All</button>
+					<button id="hide-all-kdpercent">Hide All</button>
 				</div>
 			</div>
 		</div>
