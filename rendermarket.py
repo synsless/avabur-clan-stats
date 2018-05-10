@@ -53,6 +53,7 @@ c = conn.cursor()
 c.execute("SELECT DISTINCT(resource) FROM market")
 resources = [x[0] for x in c.fetchall()]
 data = dict()
+data['_going'] = dict()
 for r in resources:
     c.execute("SELECT DISTINCT(datestamp) FROM market WHERE resource=? ORDER BY datestamp", (r,))
     dates = [x[0] for x in c.fetchall()]
@@ -80,6 +81,10 @@ for r in resources:
 
         entry = {'date': d, 'inventory': count, 'minprice': minprice, 'mean': mean, 'p10': p10, 'p50': p50, 'p90': p90}
         node.append(entry)
+    p10data = sorted([x['p10'] for x in node])
+    p50ofp10idx = percentileIdx(len(p10data), 0.5)
+    p50ofp10 = p10data[p50ofp10idx]
+    data['_going'][r] = p50ofp10
     data[r] = node
 
 #Get list of distinct dates

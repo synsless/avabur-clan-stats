@@ -37,7 +37,7 @@ try:
             stone INTEGER
         );
     ''')
-    c.execute('''DROP TABLE ranks''')
+    c.execute('''DROP TABLE IF EXISTS ranks''')
     c.execute('''
         CREATE TABLE ranks (
             userid INTEGER,

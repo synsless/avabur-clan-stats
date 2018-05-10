@@ -99,8 +99,22 @@
 						xAxis: {
 							type: 'datetime'
 						},
+						yAxis: {
+							plotLines: [{
+								color: 'red',
+								dashStyle: 'longdashdot',
+								width: 2,
+								label: {
+									text: 'Going price'
+								},
+								value: 0
+							}],
+						},
 						subtitle: {
 							text: "(Click on the legend to hide/show different data)"
+						},
+						credits: {
+							text: '"Going rate" is the median of the P10 price over time'
 						}
 					}
 
@@ -123,6 +137,9 @@
 					//Preload the 'crystals' chart
 					dataOptions.data = {csv: buildArray(chartdata['crystals'])};
 					dataOptions.title = {text: 'crystals'};
+					console.log(chartdata['_going']['crystals']);
+					dataOptions.yAxis.plotLines[0].value = chartdata['_going']['crystals'];
+					dataOptions.yAxis.plotLines[0].label.text = "Going rate ("+chartdata['_going']['crystals'] + ")";
 					chart = new Highcharts.Chart(dataOptions);
 				});
 				$(document).on('click', '#hide-all', function() {
@@ -176,6 +193,8 @@
 					} else {
 						dataOptions.data = {csv: buildArray(chartdata[selVal])};
 						dataOptions.title = {text: selVal};
+						dataOptions.yAxis.plotLines[0].value = chartdata['_going'][selVal];
+						dataOptions.yAxis.plotLines[0].label.text = "Going rate ("+chartdata['_going'][selVal] + ")";
 					}
 					chart = new Highcharts.Chart(dataOptions);
 				});

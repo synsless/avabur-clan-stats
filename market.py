@@ -99,7 +99,7 @@ for event in ws:
                     print("Processing {} (page {})".format(resource, pageno))
                     if resource not in resources:
                         resources[resource] = dict()
-                    assert len(rec['l']) > 0
+                    #assert len(rec['l']) > 0
                     for l in rec['l']:
                         resources[resource][l['tid']] = l
                     sleep(1)
@@ -176,6 +176,7 @@ try:
         ('dragon scale', 'dragon scales'),
         ('dragon tail', 'dragon tails'),
         ('fish fin', 'fish fins'),
+        ('gem fragment', 'gem fragments'),
         ('golden apple', 'golden apples'),
         ('honeycomb', 'honeycombs'),
         ('humanoid bone', 'humanoid bones'),
