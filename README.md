@@ -25,7 +25,8 @@ You need to create a `settings.json` file matching the following structure:
 	"username": "XXX",
 	"password": "YYY",
 	"dbfile": "/path/to/database/avabur.db",
-	"csvdir": "/path/to/final/csv/files"
+	"csvdir": "/path/to/final/csv/files",
+	"marketdir": "/path/to/final/market/files"
 }
 ```
 
